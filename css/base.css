@@ -1,0 +1,191 @@
+/* base.css — body, phone frame, status bar, theme shell */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  color: var(--ink);
+  background: #e7ebe8;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+/* Stage: centers the phone on wide windows */
+.stage {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* Fit wrapper: uniformly scales the true-size phone to fit the window
+ * (no distortion). JS sets --fit and the wrapper's scaled footprint. */
+.phone-fit {
+  width: var(--phone-w);
+  height: var(--phone-h);
+  transform: scale(var(--fit, 1));
+  transform-origin: top left;
+}
+
+/* Phone frame (desktop / wide) — always true device size */
+.phone {
+  position: relative;
+  width: var(--phone-w);
+  height: var(--phone-h);
+  background: var(--ut-color-bg-canvas);
+  color: var(--ink);
+  border-radius: 54px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 11px #11201b,
+    0 0 0 13px #243730,
+    0 30px 70px -20px rgba(16, 32, 27, 0.55);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* Status bar (iOS 9:41 style) */
+.phone__statusbar {
+  flex: 0 0 auto;
+  height: 54px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  user-select: none;
+  position: relative;
+  z-index: 3;
+}
+.phone {
+  --sb-h: 54px; /* status bar height */
+  --hi-h: 26px; /* home indicator height */
+}
+.phone__statusbar {
+  transition: background var(--dur-base) var(--ease-std), color var(--dur-base) var(--ease-std);
+}
+
+/* ---- Edge-to-edge screens (as in the Figma) ----
+ * home  → AI glow runs behind a transparent status bar (dark content)
+ * photo → hero photo runs behind it (light content)
+ * reel  → reel fills the whole phone, under status bar AND home indicator */
+.phone[data-chrome="home"] .phone__viewport,
+.phone[data-chrome="photo"] .phone__viewport,
+.phone[data-chrome="reel"] .phone__viewport {
+  margin-top: calc(-1 * var(--sb-h));
+}
+.phone[data-chrome="reel"] .phone__viewport {
+  margin-bottom: calc(-1 * var(--hi-h));
+}
+.phone__statusbar[data-theme="home"] {
+  background: transparent;
+}
+.phone__statusbar[data-theme="photo"],
+.phone__statusbar[data-theme="reel"] {
+  background: transparent;
+  color: #fff;
+}
+/* Once content scrolls under it, the status bar turns frosted + dark text */
+.phone__statusbar.is-solid {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 var(--ut-color-border-subtle);
+}
+.phone[data-chrome="reel"] {
+  background: #0b0f0d;
+}
+.phone[data-chrome="reel"] .phone__home-indicator {
+  background: transparent;
+}
+.phone[data-chrome="reel"] .phone__home-indicator::after {
+  background: #fff;
+}
+.statusbar__time {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  padding-left: 6px;
+}
+.statusbar__right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.statusbar__right svg {
+  display: block;
+}
+
+/* No visible scrollbars inside the phone (like a real device) — scrolling still works */
+.phone,
+.phone * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.phone ::-webkit-scrollbar,
+.phone::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* App viewport */
+.phone__viewport {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--ut-color-bg-canvas);
+}
+
+/* Home indicator */
+.phone__home-indicator {
+  flex: 0 0 auto;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+.phone__home-indicator::after {
+  content: "";
+  width: 140px;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  opacity: 0.85;
+}
+
+/* Full-bleed on small screens: drop the frame */
+@media (max-width: 520px) {
+  body {
+    background: var(--ut-color-bg-canvas);
+  }
+  .stage {
+    padding: 0;
+  }
+  .phone-fit {
+    width: 100%;
+    height: 100dvh;
+    transform: none;
+  }
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    --sb-h: calc(54px + env(safe-area-inset-top));
+    --hi-h: calc(26px + env(safe-area-inset-bottom));
+  }
+  .phone__statusbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(54px + env(safe-area-inset-top));
+  }
+  .phone__home-indicator {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(26px + env(safe-area-inset-bottom));
+  }
+}
