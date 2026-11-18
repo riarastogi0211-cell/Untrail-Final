@@ -1,0 +1,153 @@
+/* animations.css — named keyframes + route transitions + splash timeline. */
+
+/* ---- Route transitions (for later flows) ---- */
+.screen--enter {
+  transform: translateX(100%);
+  opacity: 0.6;
+  transition: transform var(--dur-base) var(--ease-std),
+    opacity var(--dur-base) var(--ease-std);
+}
+.screen--enter-back {
+  transform: translateX(-100%);
+  opacity: 0.6;
+  transition: transform var(--dur-base) var(--ease-std),
+    opacity var(--dur-base) var(--ease-std);
+}
+.screen {
+  transition: transform var(--dur-base) var(--ease-std),
+    opacity var(--dur-base) var(--ease-std);
+}
+
+/* ================================================================ *
+ * Splash intro timeline (≈ 2s)
+ * Resting state = hidden; .is-playing releases each element on cue.
+ * ================================================================ */
+
+/* 1 · The road (u) draws upward */
+.splash__mark .mark-road {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: translateY(6px) scale(0.86);
+  clip-path: inset(100% 0 0 0);
+}
+.is-playing .splash__mark .mark-road {
+  animation: road-draw 620ms var(--ease-out) 160ms both;
+}
+@keyframes road-draw {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.86);
+    clip-path: inset(100% 0 0 0);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* 2 · The place-pin drops in with a spring */
+.splash__mark .mark-pin {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 120%;
+  transform: translateY(-26px) scale(0.3);
+}
+.is-playing .splash__mark .mark-pin {
+  animation: pin-drop 460ms var(--ease-spring) 840ms both;
+}
+@keyframes pin-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.3);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 3 · Wordmark resolves up + fades */
+.splash__wordmark {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.is-playing .splash__wordmark {
+  animation: rise-in 440ms var(--ease-out) 1240ms both;
+}
+
+/* i-dot gives a small late pop */
+.splash__wordmark .wordmark-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  transform: scale(0.2);
+}
+.is-playing .splash__wordmark .wordmark-dot {
+  animation: dot-pop 320ms var(--ease-spring) 1540ms both;
+}
+@keyframes dot-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 4 · Tagline fades up last */
+.splash__tagline {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.is-playing .splash__tagline {
+  animation: rise-in 440ms var(--ease-out) 1560ms both;
+}
+
+@keyframes rise-in {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* A gentle settle "breath" on the whole lockup once it has resolved */
+.is-settled .splash__lockup {
+  animation: settle-breath 2600ms var(--ease-std) 240ms 1;
+}
+@keyframes settle-breath {
+  0% { transform: translateY(-22px) scale(1); }
+  40% { transform: translateY(-22px) scale(1.012); }
+  100% { transform: translateY(-22px) scale(1); }
+}
+
+/* ---- Reduced motion: show everything at rest, no stagger ---- */
+@media (prefers-reduced-motion: reduce) {
+  .splash__mark .mark-road,
+  .splash__mark .mark-pin,
+  .splash__mark .wordmark-dot,
+  .splash__wordmark,
+  .splash__wordmark .wordmark-dot,
+  .splash__tagline {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    animation: none !important;
+  }
+  .is-settled .splash__lockup {
+    animation: none !important;
+  }
+}
