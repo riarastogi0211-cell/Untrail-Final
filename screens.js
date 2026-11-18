@@ -649,8 +649,10 @@ function openSaveSheet(router) {
         class: "otp__box",
         type: "text",
         inputmode: "numeric",
+        pattern: "[0-9]*", // iPhone number pad
+        enterkeyhint: i === 5 ? "done" : "next",
+        // no maxlength: SMS autofill / paste puts the whole code in one box — we spread it across all six
         autocomplete: i === 0 ? "one-time-code" : "off",
-        maxlength: "1",
         "aria-label": `Digit ${i + 1} of 6`,
       })
     );

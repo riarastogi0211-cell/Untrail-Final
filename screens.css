@@ -915,15 +915,22 @@
   gap: var(--s-4);
   padding: var(--s-2) var(--s-4) var(--s-4);
 }
-.welcome__hero {
-  flex: 0 0 auto;
+/* Hero is the one flexible piece: full 290px (Figma) when there's room,
+ * shrinks down to 150px on shorter phone screens so the Welcome screen
+ * fits without scrolling. The photo stays cropped/centred (object-fit). */
+.welcome__scroll > .welcome__hero {
+  position: relative;
+  flex: 1 1 290px;
   width: 100%;
-  aspect-ratio: 370 / 290;
+  min-height: 150px;
+  max-height: 290px;
   border-radius: var(--ut-radius-xl);
   overflow: hidden;
   background: var(--ut-color-bg-muted);
 }
 .welcome__hero img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1038,4 +1045,20 @@
   .home__scroll {
     padding-top: calc(var(--sb-h) + var(--s-3));
   }
+}
+
+/* Welcome on short real-phone screens (browser toolbars eat height):
+ * same content & order as the Figma, just tighter rhythm so it fits
+ * without scrolling. The hero photo absorbs whatever space is left. */
+@media (max-width: 520px) and (max-height: 760px) {
+  .welcome__brand { padding-top: var(--s-2); padding-bottom: 0; }
+  .welcome__scroll { gap: 10px; padding-top: var(--s-2); padding-bottom: var(--s-2); }
+  .welcome__scroll > .welcome__hero { min-height: 100px; }
+  .welcome__title { margin-top: 2px; }
+  .welcome__body { font-size: 14px; line-height: 22px; }
+  .welcome__list { gap: 8px; margin-top: 0; }
+  .welcome__bullet { font-size: 15px; line-height: 22px; }
+  .welcome__check { width: 24px; height: 24px; }
+  .welcome__footer { padding-bottom: calc(var(--s-3) + var(--hi-h)); gap: 0; }
+  .welcome__footer .link-btn { padding: 8px 12px; }
 }

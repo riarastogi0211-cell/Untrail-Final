@@ -245,15 +245,50 @@ export function openSheet({ title, titleId, body = [], onClose, closeButton = fa
   backdrop.append(sheet);
   host.append(backdrop);
 
-  requestAnimationFrame(() =>
-    requestAnimationFrame(() => backdrop.classList.add("is-open"))
-  );
+  const open = () => backdrop.classList.add("is-open");
+  requestAnimationFrame(() => requestAnimationFrame(open));
+  setTimeout(open, 60); // fallback if frames are throttled
+
+  /* ---- Real phones: keep the sheet above the on-screen keyboard ----
+   * The keyboard shrinks the *visual* viewport (and on iOS also scrolls it).
+   * We pin the backdrop to the visual viewport so the sheet always sits
+   * just above the keyboard, and scroll the focused field into view. */
+  const vv = window.visualViewport;
+  const onPhone = window.matchMedia("(max-width: 520px)").matches;
+  const fit = () => {
+    if (!vv) return;
+    Object.assign(backdrop.style, {
+      position: "fixed",
+      left: "0",
+      right: "0",
+      top: `${vv.offsetTop}px`,
+      height: `${vv.height}px`,
+      bottom: "auto",
+    });
+  };
+  const onFocusIn = (e) => {
+    if (!/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 300);
+  };
+  if (onPhone && vv) {
+    fit();
+    vv.addEventListener("resize", fit);
+    vv.addEventListener("scroll", fit);
+    window.addEventListener("resize", fit); // some browsers only fire this one
+    sheet.addEventListener("focusin", onFocusIn);
+  }
 
   let closed = false;
   function close() {
     if (closed) return;
     closed = true;
     backdrop.classList.remove("is-open");
+    if (onPhone && vv) {
+      vv.removeEventListener("resize", fit);
+      vv.removeEventListener("scroll", fit);
+      window.removeEventListener("resize", fit);
+    }
+    if (document.activeElement && sheet.contains(document.activeElement)) document.activeElement.blur(); // drop the keyboard
     document.removeEventListener("keydown", onKey, true);
     const done = () => backdrop.remove();
     backdrop.addEventListener("transitionend", done, { once: true });

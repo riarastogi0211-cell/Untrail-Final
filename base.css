@@ -198,4 +198,22 @@ body {
   .phone__home-indicator::after {
     display: none;
   }
+  /* The page itself never scrolls on a phone — only the app's own areas do.
+   * Stops the jump/bounce when the keyboard opens. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  .stage {
+    min-height: 0;
+    height: 100dvh;
+  }
+  /* iPhone zooms in on any field under 16px — keep every input at 16px */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
